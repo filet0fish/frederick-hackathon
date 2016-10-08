@@ -1,0 +1,71 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-jsonp-library/iron-jsonp-library.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="view-current">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+    </style>
+
+<iron-jsonp-library
+  library-url="[[weatherUrl]]"
+  notify-event="api-load"
+  library-loaded="{{loaded}}"></iron-jsonp-library>
+
+    <div class="card">
+      <h1 id="title">Loading</h1>
+      <div id="weather">
+      </div>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'view-current',
+      properties: {
+        "lat": Number,
+        "lon": Number,
+        "weatherUrl": {
+          computed: "getAPIURL(lat, lon)"
+        }
+      },
+      listeners: {
+        'api-load': 'gotData'
+      },
+      ready: function () {
+        navigator.geolocation.getCurrentPosition(position => {
+          this.lat = position.coords.latitude; 
+          this.lon = position.coords.longitude;
+        });
+      },
+      getAPIURL: function (lat, lon) {
+        return `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=599c15706c827e88d93e4505af822c68&callback=%%callback%%`;
+      },
+      gotData: function (data) {
+        let wdata = data.detail[0];
+        console.dir(wdata);
+
+        this.$.title.innerText = wdata.name + ' (' + this.toImperial(wdata.main.temp) + '°)';
+        this.$.weather.innerText = wdata.weather[0].description;
+      },
+      toImperial: function (k) {
+        return  Math.round(((9/5 * (k - 273)) + 32) * 10) / 10;
+      }
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,34 @@
+{
+  "name": "frederick-hackathon",
+  "homepage": "https://github.com/filet0fish/frederick-hackathon",
+  "authors": [
+    "Josh Trout <jtrout@gannett.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "^1.7.0",
+    "promise-polyfill": "^1.0.0",
+    "iron-ajax": "^1.4.3",
+    "iron-resizable-behavior": "^1.0.5",
+    "iron-selector": "^1.5.2",
+    "iron-pages": "^1.0.8",
+    "iron-localstorage": "^1.0.6",
+    "iron-flex-layout": "^1.3.1",
+    "page": "^1.7.1",
+    "app-route": "*",
+    "iron-meta": "^1.1.2",
+    "iron-iconset-svg": "^1.0.11",
+    "font-roboto": "https://github.com/PolymerElements/font-roboto",
+    "paper-styles": "^1.1.5"
+  }
+}
