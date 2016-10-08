@@ -1,0 +1,94 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-jsonp-library/iron-jsonp-library.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="weather-card.html">
+
+<dom-module id="view-hackable">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+      input[type="range"] {
+        width: 100%;
+      }
+    </style>
+
+
+    <div class="card">
+      <h1>Customize the weather</h1>
+      <paper-input id="inLocation" label="Name the location" type="text" placeholder="city name"></paper-input>
+      <paper-input id="inDesc" label="Describe the weather" type="text" placeholder="Mostly perfect"></paper-input>
+
+      <label for="inTemp">Temperature <output id="tempOut" for="inTemp"></output></label>
+      <input type="range" id="inTemp" min="-50" max="150" value="70" step="1" list="tempDashes" />
+      <datalist id="tempDashes">
+        <option>-50</option>
+        <option>0</option>
+        <option>50</option>
+        <option>100</option>
+        <option>150</option>
+      </datalist>
+
+      <select id="inIcon">
+        <option value="01" selected>clear sky</option>
+        <option value="02">few clouds</option>
+        <option value="03">scattered clouds</option>
+        <option value="04">broken clouds</option>
+        <option value="09">shower rain</option>
+        <option value="10">rain</option>
+        <option value="11">thunderstorm</option>
+        <option value="13">snow</option>
+        <option value="50">mist</option>
+      </select>
+
+      <paper-checkbox id="inDaylight" checked>Daytime</paper-checkbox>
+    </div>
+
+    <weather-card data="[[fakeData]]"></weather-card>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'view-hackable',
+      properties: {
+        fakeData: {
+          type: Object,
+          value: { name: 'Narnia', main: { temp: 300 }, weather: [{main:"Clear", description:"clear sky", icon:"01d"}] }
+        }
+      },
+      listeners: {
+        'change': '_updateFakeData',
+        'inTemp.input': '_updateFakeData',
+        'inIcon.change': '_updateFakeData'
+      },
+      _updateFakeData: function () {
+        let data = this.fakeData;
+        data.name = this.$.inLocation.value;
+        data.main.temp = this._toKelvin(this.$.inTemp.value);
+        data.weather[0].description = this.$.inDesc.value;
+        data.weather[0].icon = this.$.inIcon.value + ((this.$.inDaylight.checked) ? 'd' : 'n');
+        this.fakeData = false;
+        this.fakeData = data;
+        //this.$.tempOut.value = this.$.inTemp.value;
+      },
+      _toKelvin: function (f) {
+        return Math.round(((5/9) * (f - 32)) + 273);
+      }
+    });
+  </script>
+</dom-module>

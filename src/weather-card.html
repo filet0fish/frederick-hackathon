@@ -1,0 +1,49 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="weather-card">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 0px;
+      }
+    </style>
+
+    <div class="card">
+      <h1>[[title]]</h1>
+      <div>
+        <img src$="http://openweathermap.org/img/w/[[icon]].png" /> 
+        <span>[[description]]</span>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'weather-card',
+      properties: {
+          icon: String,
+          description: String,
+          title: {
+              type: String,
+              value: "Loading"
+          },
+          data: {
+              type: Object,
+              observer: '_dataChangeHandler'
+          }
+      },
+      _dataChangeHandler: function (wdata) {
+        this.title = (wdata) ? wdata.name + ' (' + this.toImperial(wdata.main.temp) + '°)' : 'Loading';
+        this.description = (wdata && wdata.weather.length > 0) ? wdata.weather[0].description : '';
+        this.icon = (wdata) ? wdata.weather[0].icon : '01d';
+      },
+      toImperial: function (k) {
+        return Math.round(((9/5 * (k - 273)) + 32) * 10) / 10;
+      }
+    });
+  </script>
+</dom-module>

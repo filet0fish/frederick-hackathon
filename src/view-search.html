@@ -10,10 +10,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-jsonp-library/iron-jsonp-library.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="weather-card.html">
 
-<dom-module id="view-current">
+<dom-module id="view-search">
   <template>
     <style include="shared-styles">
       :host {
@@ -25,37 +26,41 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <iron-jsonp-library
       library-url="[[weatherUrl]]"
-      notify-event="api-load"
+      notify-event="weather-load"
+      library-error-message="{{error}}"
       library-loaded="{{loaded}}"></iron-jsonp-library>
 
-    <weather-card data="[[resultData]]"></weather-card>
+    <div class="card">
+      <h1>Find a location</h1>
+      <paper-input id="input" label="City name" type="search" placeholder="search for a city" results="5"></paper-input>
+    </div>
+
+    <template is="dom-if" if="[[loaded]]">
+      <weather-card data="[[resultData]]"></weather-card>
+    </template>
   </template>
 
   <script>
     Polymer({
-      is: 'view-current',
+      is: 'view-search',
       properties: {
-        "lat": Number,
-        "lon": Number,
         "resultData": Object,
-        "weatherUrl": {
-          computed: "getAPIURL(lat, lon)"
-        }
+        "weatherUrl": String
       },
       listeners: {
-        'api-load': 'gotData'
-      },
-      ready: function () {
-        navigator.geolocation.getCurrentPosition(position => {
-          this.lat = position.coords.latitude; 
-          this.lon = position.coords.longitude;
-        });
-      },
-      getAPIURL: function (lat, lon) {
-        return `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=599c15706c827e88d93e4505af822c68&callback=%%callback%%`;
+        'weather-load': 'gotData',
+        'change': 'search'
       },
       gotData: function (data) {
-        this.resultData = data.detail[0];
+        if (data.detail && data.detail.length > 0) {
+          this.resultData = data.detail[0];
+        } else {
+          this.loaded = false;
+        }
+      },
+      search: function (e) {
+        let escaped = encodeURIComponent(this.$.input.value);
+        this.weatherUrl = `http://api.openweathermap.org/data/2.5/weather?q=${escaped}&appid=599c15706c827e88d93e4505af822c68&callback=%%callback%%`;
       }
     });
   </script>
